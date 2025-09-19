@@ -1,3 +1,5 @@
+import type { NextConfig } from 'next';
+
 const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -12,3 +14,5 @@ const nextConfig: NextConfig = {
   },
   output: "export",
 };
+
+export default nextConfig;
