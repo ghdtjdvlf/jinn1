@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProject } from "../project";
+import { getProject, PROJECTS } from "../project"; // ✅ PROJECTS도 불러오기
 
 function slugify(input: string) {
   return input
@@ -10,12 +10,22 @@ function slugify(input: string) {
     .replace(/ +/g, "-");
 }
 
+// ✅ 동적 라우트용 파라미터를 정적으로 지정
+export async function generateStaticParams() {
+  return PROJECTS.map((p) => ({
+    id: p.id, // PROJECTS 배열의 id 값 사용
+  }));
+}
+
 export default function Detail({ params }: { params: { id: string } }) {
   const project = getProject(params.id);
   if (!project) return notFound();
 
   const sections = project.sections ?? [
-    { title: "Overview", paragraphs: [project.summary || "", project.description || ""].filter(Boolean) },
+    {
+      title: "Overview",
+      paragraphs: [project.summary || "", project.description || ""].filter(Boolean),
+    },
   ];
 
   return (
@@ -38,23 +48,35 @@ export default function Detail({ params }: { params: { id: string } }) {
         </div>
         <div className="mt-3 flex gap-3">
           {project.link && (
-            <a href={project.link} target="_blank" rel="noreferrer noopener" className="inline-flex items-center rounded-lg border px-3 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:text-zinc-200 dark:border-zinc-700 dark:hover:bg-zinc-800">
+            <a
+              href={project.link}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center rounded-lg border px-3 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:text-zinc-200 dark:border-zinc-700 dark:hover:bg-zinc-800"
+            >
               Live 사이트 보기 <span className="ml-1">↗</span>
             </a>
           )}
-          <Link href="/portfolio" className="inline-flex items-center rounded-lg border px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-800">목록으로</Link>
+          <Link
+            href="/portfolio"
+            className="inline-flex items-center rounded-lg border px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          >
+            목록으로
+          </Link>
         </div>
       </header>
 
       {/* Layout: README(좌) + TOC(우) */}
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_260px]">
-        {/* README 본문 */}
         <article className="max-w-none">
           {sections.map((sec) => {
             const id = slugify(sec.title);
             return (
               <section key={id} className="mt-10">
-                <h2 id={id} className="group scroll-mt-24 text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+                <h2
+                  id={id}
+                  className="group scroll-mt-24 text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100"
+                >
                   <a href={`#${id}`} className="inline-flex items-center">
                     {sec.title}
                     <span className="ml-2 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 dark:text-zinc-500">#</span>
@@ -71,19 +93,26 @@ export default function Detail({ params }: { params: { id: string } }) {
                   </ul>
                 )}
                 {sec.code?.map((c, i) => (
-                  <pre key={i} className="mt-4 overflow-x-auto rounded-xl bg-zinc-900 p-4 text-sm leading-relaxed text-zinc-100">
+                  <pre
+                    key={i}
+                    className="mt-4 overflow-x-auto rounded-xl bg-zinc-900 p-4 text-sm leading-relaxed text-zinc-100"
+                  >
                     <code>{c.content}</code>
                   </pre>
                 ))}
                 {sec.images?.map((img, i) => (
-                  <img key={i} src={img.src} alt={img.alt || ''} className="mt-4 rounded-xl border dark:border-zinc-800" />
+                  <img
+                    key={i}
+                    src={img.src}
+                    alt={img.alt || ""}
+                    className="mt-4 rounded-xl border dark:border-zinc-800"
+                  />
                 ))}
               </section>
             );
           })}
         </article>
 
-        {/* TOC */}
         <aside className="hidden lg:block">
           <div className="sticky top-24 rounded-xl border p-4 text-sm dark:border-zinc-800">
             <p className="mb-3 font-medium text-zinc-700 dark:text-zinc-200">On this page</p>
@@ -92,7 +121,12 @@ export default function Detail({ params }: { params: { id: string } }) {
                 const id = slugify(sec.title);
                 return (
                   <li key={id}>
-                    <a href={`#${id}`} className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100">{sec.title}</a>
+                    <a
+                      href={`#${id}`}
+                      className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                    >
+                      {sec.title}
+                    </a>
                   </li>
                 );
               })}

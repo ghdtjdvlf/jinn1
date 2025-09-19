@@ -3,6 +3,13 @@
 import Link from "next/link";
 import { CATEGORY_LABEL, SKILLS, type SkillCategory } from "../data";
 
+export async function generateStaticParams() {
+  const categories = Object.keys(CATEGORY_LABEL) as SkillCategory[];
+  return categories.map((category) => ({
+    category,
+  }));
+}
+
 type Params = { category: string };
 
 function isCategory(v: string): v is SkillCategory {
